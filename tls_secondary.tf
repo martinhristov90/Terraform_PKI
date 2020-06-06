@@ -37,7 +37,7 @@ resource "tls_self_signed_cert" "secondary_ca" {
 # Saving the CA cert to a file
 resource "local_file" "ca" {
   content  = tls_self_signed_cert.secondary_ca.cert_pem
-  filename = "${path.module}/root_ca.pem"
+  filename = "${path.module}/ca.pem"
 }
 
 #### GENERATING KEYS FOR SERVERS
@@ -55,7 +55,7 @@ resource "tls_cert_request" "csr_secondary_vault" {
   private_key_pem = tls_private_key.private_key_secondary_vault[each.key].private_key_pem
 
   subject {
-    common_name  = "${each.value}.secondary.local" # Just a name, the real names and adresses are in SANs
+    common_name  = "${each.key}.secondary.local" # Just a name, the real names and adresses are in SANs
     organization = "Vault Secondary Cluster"
   }
 
@@ -94,7 +94,7 @@ resource "local_file" "private_key_secondary" {
   for_each = var.vault_nodes
 
   content  = tls_private_key.private_key_secondary_vault[each.key].private_key_pem
-  filename = "${path.module}/${each.key}_private_key.key"
+  filename = "${path.module}/vault-server-${each.value}.key"
 }
 
 # Saving the cert that is going to be used by Vault server
@@ -102,5 +102,5 @@ resource "local_file" "vault_cert_secondary" {
   for_each = var.vault_nodes
 
   content  = tls_locally_signed_cert.vault_cert_sign[each.key].cert_pem
-  filename = "${path.module}/${each.key}_cert.pem"
+  filename = "${path.module}/vault-server-${each.value}.crt"
 }
