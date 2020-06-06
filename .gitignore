@@ -1,0 +1,7 @@
+vault0_cert.pem
+vault0_private_key.key
+vault1_cert.pem
+vault1_private_key.key
+vault2_cert.pem
+vault2_private_key.key
+root_ca.pem
